@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @State private var learningSubject: String = ""
-    @State private var selectedTimeFrame: String = "Month"
     
-    @EnvironmentObject var timeFrameState: TimeFrameState
+    //@EnvironmentObject var globalObject: OnboardingViewModel
+    
+    @State private var learningSubject: String = ""
+    @EnvironmentObject  var viewModel: OnboardingViewModel
+
+//    For test to be deleted!!!
+    //@StateObject private var viewModel = OnboardingViewModel()
     
     var body: some View {
         NavigationView {
@@ -16,7 +20,7 @@ struct OnboardingView: View {
                     
                     ZStack {
                         Circle()
-                            .foregroundColor(Color("DarkBackgroundColor"))
+                            .fill(Color("DarkBackgroundColor"))
                             .frame(width: 118, height: 118)
                         
                         Text("🔥")
@@ -63,14 +67,14 @@ struct OnboardingView: View {
                         HStack {
                             ForEach(TimeFrame.allCases, id: \.self) { timeFrame in
                                 Button(action: {
-                                    timeFrameState.selectedTimeFrame = timeFrame
+                                    viewModel.selectedTimeFrame = timeFrame
                                     //print(timeFrameState.selectedTimeFrame)
                                 }) {
                                     Text(timeFrame.rawValue)
                                         .frame(width: 68, height: 37)
                                         .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(timeFrameState.selectedTimeFrame == timeFrame ? .black : Color("primaryOrangeColor"))
-                                        .background(timeFrameState.selectedTimeFrame == timeFrame ? Color("primaryOrangeColor") : Color("DarkBackgroundColor"))
+                                        .foregroundColor(viewModel.selectedTimeFrame == timeFrame ? .black : Color("primaryOrangeColor"))
+                                        .background(viewModel.selectedTimeFrame == timeFrame ? Color("primaryOrangeColor") : Color("DarkBackgroundColor"))
                                         .cornerRadius(8)
                                 }}
                         }
@@ -84,7 +88,7 @@ struct OnboardingView: View {
                     Spacer().frame(height: 58)
                     
                     
-                    NavigationLink(destination: CurrentDayView()) {
+                    NavigationLink(destination: currentDayView()) {
                         HStack {
                             Text("Start")
                                 .font(.system(size: 16, weight: .semibold))
@@ -96,7 +100,10 @@ struct OnboardingView: View {
                         .frame(width: 151, height: 52)
                         .background(Color("primaryOrangeColor"))
                         .cornerRadius(8)
-                    }
+                    } .simultaneousGesture(TapGesture().onEnded {
+                        viewModel.learningGoal = learningSubject
+                        //print(globalObject.learningGoal)
+                    })
                     .padding(.bottom, 231)
 
                 }
@@ -105,25 +112,7 @@ struct OnboardingView: View {
     }
 }
 
-struct TimeFrameButton: View {
-    var title: String
-    @Binding var selectedTimeFrame: String
-    
-    var body: some View {
-        Button(action: {
-            selectedTimeFrame = title
-        }) {
-            Text(title)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(selectedTimeFrame == title ? .black : .white)
-                .padding()
-                .background(selectedTimeFrame == title ? Color.orange : Color.gray)
-                .cornerRadius(10)
-        }
-    }
-}
 
 #Preview {
     OnboardingView()
-            .environmentObject(TimeFrameState())
 }

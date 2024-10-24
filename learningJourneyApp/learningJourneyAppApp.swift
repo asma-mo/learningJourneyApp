@@ -1,17 +1,15 @@
-//
-//  learningJourneyAppApp.swift
-//  learningJourneyApp
-//
-//  Created by Asma on 22/10/2024.
-//
-
 import SwiftUI
 
 @main
 struct learningJourneyAppApp: App {
+    
+    // How to use enviroment Object? It is global storage
+    @StateObject  var globalObject = OnboardingViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            OnboardingView()
+                .environmentObject(globalObject)
         }
     }
 }
