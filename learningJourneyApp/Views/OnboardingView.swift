@@ -5,7 +5,7 @@ struct OnboardingView: View {
     //@EnvironmentObject var globalObject: OnboardingViewModel
     
     @State private var learningSubject: String = ""
-    @EnvironmentObject  var viewModel: OnboardingViewModel
+    @EnvironmentObject  var OnboardingVM: OnboardingViewModel
 
 //    For test to be deleted!!!
     //@StateObject private var viewModel = OnboardingViewModel()
@@ -67,14 +67,14 @@ struct OnboardingView: View {
                         HStack {
                             ForEach(TimeFrame.allCases, id: \.self) { timeFrame in
                                 Button(action: {
-                                    viewModel.selectedTimeFrame = timeFrame
+                                    OnboardingVM.selectedTimeFrame = timeFrame
                                     //print(timeFrameState.selectedTimeFrame)
                                 }) {
                                     Text(timeFrame.rawValue)
                                         .frame(width: 68, height: 37)
                                         .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(viewModel.selectedTimeFrame == timeFrame ? .black : Color("primaryOrangeColor"))
-                                        .background(viewModel.selectedTimeFrame == timeFrame ? Color("primaryOrangeColor") : Color("DarkBackgroundColor"))
+                                        .foregroundColor(OnboardingVM.selectedTimeFrame == timeFrame ? .black : Color("primaryOrangeColor"))
+                                        .background(OnboardingVM.selectedTimeFrame == timeFrame ? Color("primaryOrangeColor") : Color("DarkBackgroundColor"))
                                         .cornerRadius(8)
                                 }}
                         }
@@ -88,7 +88,7 @@ struct OnboardingView: View {
                     Spacer().frame(height: 58)
                     
                     
-                    NavigationLink(destination: currentDayView()) {
+                    NavigationLink(destination: CurrentDayView()) {
                         HStack {
                             Text("Start")
                                 .font(.system(size: 16, weight: .semibold))
@@ -101,8 +101,8 @@ struct OnboardingView: View {
                         .background(Color("primaryOrangeColor"))
                         .cornerRadius(8)
                     } .simultaneousGesture(TapGesture().onEnded {
-                        viewModel.learningGoal = learningSubject
-                        //print(globalObject.learningGoal)
+                        OnboardingVM.learningGoal = learningSubject
+                        print("obBoarding \(OnboardingVM.learningGoal)")
                     })
                     .padding(.bottom, 231)
 

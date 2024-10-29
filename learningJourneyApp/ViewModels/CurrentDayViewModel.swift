@@ -8,7 +8,19 @@ class CurrentDayViewModel: ObservableObject {
     @Published var daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
     @Published var weekOffset: Int = 0
     
-    private var test = true
+    @Published var testDate: Date? = nil //Calendar.current.nextDate(after: Date(), matching: DateComponents(weekday: 7), matchingPolicy: .nextTime)
+    
+    @Published var test: Bool  = true {
+        didSet {
+            
+            updateCurrentWeekDays()
+        }
+    }
+    
+    func effectiveDate() -> Date {
+        return testDate ?? Date()
+    }
+
     
     private var calendar = Calendar.current
 
@@ -20,16 +32,14 @@ class CurrentDayViewModel: ObservableObject {
     
     //for testing!!
     var today: Day {
-        currentWeekDays.first(where: { Calendar.current.isDate($0.date, inSameDayAs: Date()) }) ?? currentWeekDays[0]
+        currentWeekDays.first(where: { Calendar.current.isDate($0.date, inSameDayAs: effectiveDate()) }) ?? currentWeekDays[0]
     }
     
-    // New method to handle previous week navigation
     func previousWeek() {
         weekOffset -= 1
         updateCurrentWeekDays()
     }
     
-    // New method to handle next week navigation
     func nextWeek() {
         weekOffset += 1
         updateCurrentWeekDays()
@@ -37,10 +47,10 @@ class CurrentDayViewModel: ObservableObject {
     
     func updateCurrentWeekDays() {
         
-        // Get the current date and add the week offset
-        let currentDate = Calendar.current.date(byAdding: .weekOfYear, value: weekOffset, to: Date()) ?? Date()
         
-        // Get the start of the week for the offset date
+        let currentDate = Calendar.current.date(byAdding: .weekOfYear, value: weekOffset, to: effectiveDate()) ?? Date()
+        
+       
         guard let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: currentDate)?.start else {
             return
         }
@@ -52,10 +62,12 @@ class CurrentDayViewModel: ObservableObject {
                 
                 // Dummy Data
                 let dayOfWeek = calendar.component(.weekday, from: date) - 1
+            
+                //Streak Full Test
+//                if (0...5).contains(dayOfWeek){
+//                    return Day(date: date, state: .streak)
                 
-                if dayOfWeek == 4 {
-                    return Day(date: date, state: .none)
-                } else if dayOfWeek == 2 || dayOfWeek == 1 || dayOfWeek == 3 {
+                if dayOfWeek == 1 {
                     return Day(date: date, state: .streak)
                 } else if dayOfWeek == 0 {
                     return Day(date: date, state: .freeze)
@@ -90,7 +102,7 @@ class CurrentDayViewModel: ObservableObject {
     // MARK: - Colors control
     
     func logText(for day: Day) -> String {
-            let isToday = calendar.isDate(day.date, inSameDayAs: Date())
+            let isToday = calendar.isDate(day.date, inSameDayAs: effectiveDate())
             
             switch day.state {
             case .streak:
@@ -103,7 +115,7 @@ class CurrentDayViewModel: ObservableObject {
         }
     
     func backgroundColor(for day: Day) -> Color {
-            let isToday = calendar.isDate(day.date, inSameDayAs: Date())
+            let isToday = calendar.isDate(day.date, inSameDayAs: effectiveDate())
             
             switch day.state {
             case .streak:
@@ -116,7 +128,7 @@ class CurrentDayViewModel: ObservableObject {
         }
     
     func textColor(for day: Day) -> Color {
-            let isToday = calendar.isDate(day.date, inSameDayAs: Date())
+            let isToday = calendar.isDate(day.date, inSameDayAs: effectiveDate())
             
             switch day.state {
             case .streak:
@@ -162,6 +174,9 @@ class CurrentDayViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Wokflow's condition checker
+    
+    
 
     
     
@@ -193,8 +208,9 @@ class CurrentDayViewModel: ObservableObject {
     
     //why _ date and not date?? becouse when i call it i can immediatly give it a value instead of writing -> date: value ;)
     private func isToday(_ date: Date) -> Bool {
-        Calendar.current.isDate(date, inSameDayAs: Date())
+        return Calendar.current.isDate(date, inSameDayAs: effectiveDate())
     }
+
 
     private func updateStreakAndFreezeCounts() {
         currentStreak = currentWeekDays.filter { $0.state == .streak }.count
